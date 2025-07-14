@@ -32,7 +32,7 @@ const Chat = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('https://lawline-ai-backend.onrender.com', {
+            const response = await fetch('https://lawline-ai-backend.onrender.com/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: input }),
