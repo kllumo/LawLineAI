@@ -2,8 +2,8 @@ const express = require('express');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const prompts = require('./prompts.js'); // Import our prompt library
-const { findRelevantArticles } = require('./labor_code_kz.js'); // Import our RAG function
+const prompts = require('./prompts.js');
+const { findRelevantArticles } = require('./legal_database.js'); // Updated file name
 
 dotenv.config();
 
@@ -15,34 +15,40 @@ app.use(express.json());
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// List of all assistants that have RAG capabilities
+const ragEnabledAssistants = [
+    'workplace_advisor',
+    'family_law',
+    'consumer_rights',
+    'contract_advisor',
+    'corporate_assistant'
+];
+
 app.post('/api/chat', async (req, res) => {
     try {
         const { message, country, sector, subSector } = req.body;
 
         if (!message || !country || !sector || !subSector) {
-            return res.status(400).json({ error: 'Missing required fields: message, country, sector, subSector' });
+            return res.status(400).json({ error: 'Missing required fields' });
         }
 
-        // --- Dynamic Prompt Selection ---
-        let systemPromptText = prompts[country]?.[sector]?.[subSector];
-
-        if (!systemPromptText) {
-            systemPromptText = "You are a general helpful assistant."; // Fallback prompt
-        }
-
-        // --- RAG Logic for the Special Demo Case ---
+        let systemPromptText = prompts[country]?.[sector]?.[subSector] || "You are a general helpful assistant.";
+        
         let ragContext = "";
-        if (country === 'kazakhstan' && sector === 'b2c' && subSector === 'workplace_advisor') {
-            const relevantArticles = findRelevantArticles(message);
+
+        // --- SCALABLE RAG LOGIC ---
+        // Check if the selected assistant is in our RAG-enabled list
+        if (country === 'kazakhstan' && ragEnabledAssistants.includes(subSector)) {
+            const relevantArticles = findRelevantArticles(message, subSector);
+            
             if (relevantArticles.length > 0) {
                 ragContext = " Based ONLY on the following legal context, answer the user's question. Start your answer by citing the article.\n\nCONTEXT:\n";
                 relevantArticles.forEach(article => {
-                    ragContext += `Article: ${article.id}\nText: ${article.text}\n\n`;
+                    ragContext += `From: ${article.id}\nText: ${article.text}\n\n`;
                 });
             }
         }
         
-        // Combine the base prompt with the RAG context
         const finalSystemPrompt = systemPromptText + ragContext;
 
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -61,7 +67,7 @@ app.post('/api/chat', async (req, res) => {
         res.json({ message: text });
     } catch (error) {
         console.error("Error in /api/chat:", error);
-        res.status(500).json({ error: 'Something went wrong with the AI service.' });
+        res.status(500).json({ error: 'Something went wrong.' });
     }
 });
 
