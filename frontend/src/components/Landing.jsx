@@ -323,8 +323,8 @@ const Landing = () => {
                         <h3 className="text-3xl font-bold">Let's Discuss Your Needs</h3>
                         <p className="mt-4 text-lg text-slate-600">Whether you are a government entity, a business, or an investor, we're ready to talk.</p>
                         <div className="mt-8 space-y-4">
-                            <p className="flex items-center gap-3"><span className="text-accent">@</span> abdbilminn@gmail.com</p>
-                            <p className="flex items-center gap-3"><span className="text-accent">📞</span> +7 (778) 336-33-63</p>
+                            <p className="flex items-center gap-3"><span className="text-accent">@</span> kadylbekd@gmail.com</p>
+                            <p className="flex items-center gap-3"><span className="text-accent">📞</span> +7 (708) 927-26-91</p>
                         </div>
                     </div>
                     <div className="bg-white p-8 rounded-lg shadow-lg min-h-[480px]">
