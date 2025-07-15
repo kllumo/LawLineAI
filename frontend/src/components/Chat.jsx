@@ -1,7 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown'; // Import the new package
+import { Link, useLocation } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+
+// Custom hook to parse URL query parameters
+function useQuery() {
+    return new URLSearchParams(useLocation().search);
+}
 
 // Simple Avatar for the AI
 const AIAvatar = () => (
@@ -11,8 +16,15 @@ const AIAvatar = () => (
 );
 
 const Chat = () => {
+    const query = useQuery();
+    const chatSelections = useRef({
+        country: query.get('country'),
+        sector: query.get('sector'),
+        subSector: query.get('subSector'),
+    });
+
     const [messages, setMessages] = useState([
-        { text: "Hello! I'm LawLine AI, your AI legal assistant. How can I help you today?", sender: 'ai' }
+        { text: "Hello! I am your specialized LawLine AI assistant. How can I help you today?", sender: 'ai' }
     ]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -36,7 +48,12 @@ const Chat = () => {
             const response = await fetch('https://lawline-ai-backend.onrender.com/api/chat', { // Make sure this is your correct Render URL
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: input }),
+                body: JSON.stringify({
+                    message: input,
+                    country: chatSelections.current.country,
+                    sector: chatSelections.current.sector,
+                    subSector: chatSelections.current.subSector
+                }),
             });
 
             if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
@@ -69,7 +86,6 @@ const Chat = () => {
                         >
                              {msg.sender === 'ai' && <AIAvatar />}
                             <div className={`p-4 rounded-2xl max-w-lg break-words text-base ${msg.sender === 'user' ? 'bg-blue-600 text-white rounded-br-none' : 'bg-white text-slate-800 shadow-sm border border-slate-200 rounded-bl-none'}`}>
-                                {/* THIS IS THE KEY CHANGE! We now use ReactMarkdown to render the text. */}
                                 <ReactMarkdown className="prose prose-slate">
                                     {msg.text}
                                 </ReactMarkdown>
@@ -77,7 +93,7 @@ const Chat = () => {
                         </motion.div>
                     ))}
                      {isLoading && (
-                        <div className="flex items-start gap-3 justify-start">
+                        <div className="flex justify-start">
                              <AIAvatar />
                              <div className="p-4 rounded-2xl bg-white text-slate-800 shadow-sm border border-slate-200 rounded-bl-none">
                                 <div className="typing-indicator">
