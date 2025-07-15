@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
-import defaultTheme from 'tailwindcss/defaultTheme';
+const defaultTheme = require('tailwindcss/defaultTheme');
 
-export default {
+module.exports = {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -9,8 +9,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        'primary': '#0A2A43',   // Deep Blue
-        'accent': '#00C9A7',    // Vibrant Teal
+        'primary': '#0A2A43',
+        'accent': '#00C9A7',
         'light-gray': '#F5F7FA',
       },
       fontFamily: {
@@ -20,6 +20,6 @@ export default {
   },
   plugins: [
     require('@tailwindcss/typography'),
-    require('@tailwindcss/forms'), // Added for better form styling
+    require('@tailwindcss/forms'),
   ],
-}
+};
