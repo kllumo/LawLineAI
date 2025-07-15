@@ -141,3 +141,20 @@
         transform: translateY(0px) rotate(0deg);
     }
 }
+
+/* === New Styles for Redesigned Landing Page === */
+#hero-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Custom styling for pricing table checkmarks */
+.pricing-checkmark {
+  color: #00C9A7; /* Teal Accent Color */
+  width: 1.5rem;
+  height: 1.5rem;
+}
