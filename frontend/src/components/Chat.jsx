@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown'; // Import the new package
 
 // Simple Avatar for the AI
 const AIAvatar = () => (
@@ -32,7 +33,7 @@ const Chat = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('https://lawline-ai-backend.onrender.com/api/chat', {
+            const response = await fetch('https://lawline-ai-backend.onrender.com/api/chat', { // Make sure this is your correct Render URL
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: input }),
@@ -68,7 +69,10 @@ const Chat = () => {
                         >
                              {msg.sender === 'ai' && <AIAvatar />}
                             <div className={`p-4 rounded-2xl max-w-lg break-words text-base ${msg.sender === 'user' ? 'bg-blue-600 text-white rounded-br-none' : 'bg-white text-slate-800 shadow-sm border border-slate-200 rounded-bl-none'}`}>
-                                {msg.text}
+                                {/* THIS IS THE KEY CHANGE! We now use ReactMarkdown to render the text. */}
+                                <ReactMarkdown className="prose prose-slate">
+                                    {msg.text}
+                                </ReactMarkdown>
                             </div>
                         </motion.div>
                     ))}
