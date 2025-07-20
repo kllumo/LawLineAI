@@ -3,7 +3,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const prompts = require('./prompts.js');
-const { findRelevantArticles } = require('./legal_database.js'); // Updated file name
+const { findRelevantArticles } = require('./legal_database.js'); 
 
 dotenv.config();
 
@@ -15,7 +15,6 @@ app.use(express.json());
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// List of all assistants that have RAG capabilities
 const ragEnabledAssistants = [
     'workplace_advisor',
     'family_law',
@@ -35,14 +34,15 @@ app.post('/api/chat', async (req, res) => {
         let systemPromptText = prompts[country]?.[sector]?.[subSector] || "You are a general helpful assistant.";
         
         let ragContext = "";
-
-        // --- SCALABLE RAG LOGIC ---
-        // Check if the selected assistant is in our RAG-enabled list
+        
         if (country === 'kazakhstan' && ragEnabledAssistants.includes(subSector)) {
             const relevantArticles = findRelevantArticles(message, subSector);
             
             if (relevantArticles.length > 0) {
-                ragContext = " Based ONLY on the following legal context, answer the user's question. Start your answer by citing the article.\n\nCONTEXT:\n";
+                // This is the new, stricter instruction for the AI
+                ragContext = " You are a legal information assistant. Your task is to answer the user's question based ONLY on the legal articles provided below in the CONTEXT section. " +
+                             "You are strictly forbidden from using any outside knowledge or mentioning any articles not provided in the context. " +
+                             "Begin your answer by citing the specific article you are using from the context. If the provided context is not sufficient to answer, you must state that the provided information does not contain the answer.\n\nCONTEXT:\n";
                 relevantArticles.forEach(article => {
                     ragContext += `From: ${article.id}\nText: ${article.text}\n\n`;
                 });
@@ -52,6 +52,7 @@ app.post('/api/chat', async (req, res) => {
         const finalSystemPrompt = systemPromptText + ragContext;
 
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
         const chat = model.startChat({
             history: [
                 { role: "user", parts: [{ text: finalSystemPrompt }] },

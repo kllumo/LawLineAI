@@ -45,7 +45,8 @@ const Chat = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('https://lawline-ai-backend.onrender.com/api/chat', { // Make sure this is your correct Render URL
+            // NOTE: Use your live Render URL when deployed
+            const response = await fetch('http://localhost:3001/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -68,9 +69,7 @@ const Chat = () => {
     };
 
     return (
-        // CHANGE: Use our brand's light-gray for the main background
         <div className="flex flex-col h-screen bg-light-gray font-sans">
-             {/* CHANGE: Header now uses the primary brand color for a professional look */}
              <header className="bg-primary shadow-md p-4">
                 <div className="container mx-auto flex justify-between items-center">
                     <Link to="/" className="text-2xl font-bold text-white">LawLine AI</Link>
@@ -89,12 +88,14 @@ const Chat = () => {
                              {msg.sender === 'ai' && <AIAvatar />}
                             <div className={`p-4 rounded-2xl max-w-lg break-words text-base 
                                 ${msg.sender === 'user' 
-                                    ? 'bg-accent text-primary font-semibold rounded-br-none' // CHANGE: User's bubble is now the vibrant teal accent color
+                                    ? 'bg-accent text-primary font-semibold rounded-br-none'
                                     : 'bg-white text-slate-800 shadow-sm border border-slate-200 rounded-bl-none'
                                 }`}>
-                                <ReactMarkdown className="prose prose-slate prose-strong:text-primary">
-                                    {msg.text}
-                                </ReactMarkdown>
+                                <div className="prose prose-slate prose-strong:text-primary">
+                                    <ReactMarkdown>
+                                        {msg.text}
+                                    </ReactMarkdown>
+                                </div>
                             </div>
                         </motion.div>
                     ))}
@@ -126,11 +127,11 @@ const Chat = () => {
                         <button
                             onClick={handleSend}
                             disabled={isLoading}
-                            // CHANGE: Send button now uses the accent color
                             className="p-2 bg-accent text-primary font-semibold rounded-full hover:opacity-90 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed transition"
                         >
-                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
-                                <path d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086L2.28 16.76a.75.75 0 00.95.826l16-5.333a.75.75 0 000-1.492l-16-5.333z" />
+                             {/* ===== CORRECTED ICON SVG ===== */}
+                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                               <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
                              </svg>
                         </button>
                     </div>
